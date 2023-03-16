@@ -1,102 +1,77 @@
-const todoList = ["Belajar Javascript", "Belajar HTML"];
+const todos = ["Belajar Javascript", "Belajar HTML"];
 
-console.log("╔══════════════════════════╗");
-console.log("║    APLIKASI TODO LIST    ║");
-console.log("╚══════════════════════════╝");
+const inputBox = document.querySelector(".inputField input");
+const addBtn = document.querySelector(".inputField button#add");
+const editBtn = document.querySelector(".inputField button#edit");
+const cancelBtn = document.querySelector(".inputField button#cancel");
+const todoList = document.querySelector(".todoList");
 
-// print todo list
-function showTodoList() {
-  console.log("\n──────┤ TODO LIST ├───────");
-  todoList.forEach((todo, i) => {
-    // string template literal
-    console.log(`${i + 1}. ${todo}`);
-  });
-}
-
-function showMenu() {
-  const pilihan = showPilihMenu();
-
-  if (pilihan == "1") tambahTodo();
-  else if (pilihan == "2") ubahTodo();
-  else if (pilihan == "3") hapusTodo();
-  else if (pilihan == "4") {
-    console.log("\nSampai jumpa!");
-    return;
-  } else console.log("\n✘ Pilihan tidak benar.");
-
-  showMenu();
-}
-
-function showPilihMenu() {
-  showTodoList();
-  console.log("\n");
-
-  console.log("──────┤ PILIH MENU ├───────");
-  console.log("1. Tambah");
-  console.log("2. Edit");
-  console.log("3. Hapus");
-  console.log("4. Keluar");
-
-  const pilihan = prompt("Pilih menu");
-  return pilihan;
-}
-
-function tambahTodo() {
-  console.log("\n──────┤ MENAMBAH TODO ├───────");
-  const todoBaru = prompt("Masukkan todo baru:");
-  todoList.push(todoBaru);
-  console.log("✔ Todo berhasil ditambahkan.");
-}
-
-function ubahTodo() {
-  console.log("\n──────┤ MENGUBAH TODO ├───────");
-  const todoEdit = prompt("Masukkan nomor todo:");
-  if (todoEdit > todoList.length || todoEdit < 1) {
-    alert("Todo tersebut tidak ada.");
-    console.log("✘ Todo gagal diubah.");
-  } else {
-    const todoBaru = prompt("Masukkan todo baru");
-    todoList[todoEdit - 1] = todoBaru;
-    console.log("✔ Todo berhasil diubah.");
-  }
-}
-
-function hapusTodo() {
-  console.log("\n──────┤ MENGHAPUS TODO ├───────");
-  const todoHapus = prompt("Masukkan nomor todo:");
-
-  if (todoHapus > todoList.length || todoHapus < 1) {
-    alert("Todo tersebut tidak ada.");
-    console.log("✘ Todo gagal dihapus.");
-  } else {
-    todoList.splice(todoHapus - 1, 1);
-    console.log("✔ Todo berhasil dihapus.");
-  }
-}
-
-showMenu();
-
-// ambil element
-const listUl = document.getElementById("list");
-const btnTambah = document.querySelector("button#btn-tambah");
-
-// tampilkan ke html
-function showToDocument() {
-  let list = "";
-  todoList.forEach((todo) => {
-    list += `<li>${todo}</li>`;
+function showTodos() {
+  let newLiTag = "";
+  todos.forEach((element, index) => {
+    newLiTag += `
+    <li>
+      ${element}
+      <span class="icon">
+        <span class="icon-item edit" onclick="editTodo(${index})">
+          <i class="fas fa-pen"></i>
+        </span>
+        <span class="icon-item delete" onclick="deleteTodo(${index})">
+          <i class="fas fa-trash"></i>
+        </span>
+      </span>
+    </li>`;
   });
 
-  listUl.innerHTML = list;
+  todoList.innerHTML = newLiTag;
 }
-
-btnTambah.onclick = () => {
-  const todoBaru = document.getElementById("form-tambah").value;
-  if (todoBaru) {
-    todoList.push(todoBaru);
-    document.getElementById("form-tambah").value = "";
-    showToDocument();
+// onkeyup event
+inputBox.onkeyup = () => {
+  let userEnteredValue = inputBox.value;
+  if (userEnteredValue.trim() != 0) {
+    addBtn.classList.add("active");
+  } else {
+    addBtn.classList.remove("active");
   }
 };
 
-// showToDocument();
+addBtn.onclick = () => {
+  let userEnteredValue = inputBox.value;
+  todos.push(userEnteredValue);
+  addBtn.classList.remove("active");
+  inputBox.value = "";
+  showTodos();
+};
+
+function editTodo(index) {
+  editBtn.classList.remove("hide");
+  cancelBtn.classList.remove("hide");
+  addBtn.classList.add("hide");
+  inputBox.value = todos[index];
+
+  editBtn.onclick = () => {
+    let userEnteredValue = inputBox.value;
+    todos[index] = userEnteredValue;
+    inputBox.value = "";
+    editBtn.classList.add("hide");
+    cancelBtn.classList.add("hide");
+    addBtn.classList.remove("hide");
+    addBtn.classList.remove("active");
+    showTodos();
+  };
+
+  cancelBtn.onclick = () => {
+    inputBox.value = "";
+    editBtn.classList.add("hide");
+    cancelBtn.classList.add("hide");
+    addBtn.classList.remove("hide");
+    addBtn.classList.remove("active");
+  };
+}
+
+function deleteTodo(index) {
+  todos.splice(index, 1);
+  showTodos();
+}
+
+showTodos();
